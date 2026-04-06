@@ -1,8 +1,9 @@
 import Anthropic from "@anthropic-ai/sdk";
-import formidable from "formidable";
-import fs from "fs";
-import pdfParse from "pdf-parse";
-import mammoth from "mammoth";
+
+const formidable = require("formidable");
+const fs = require("fs");
+const pdfParse = require("pdf-parse");
+const mammoth = require("mammoth");
 
 export const config = {
   api: {
