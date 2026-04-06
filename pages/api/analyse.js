@@ -1,8 +1,16 @@
 import Anthropic from "@anthropic-ai/sdk";
-import formidable from "formidable";
-import fs from "fs";
-import pdfParse from "pdf-parse";
-import mammoth from "mammoth";
+
+// Lazy-load server-side packages to avoid Turbopack bundling
+let formidable, pdfParse, mammoth, fs;
+
+function initializeModules() {
+  if (!formidable) {
+    formidable = require("formidable");
+    pdfParse = require("pdf-parse");
+    mammoth = require("mammoth");
+    fs = require("fs");
+  }
+}
 
 export const config = {
   api: {
@@ -47,6 +55,8 @@ async function extractText(file) {
 }
 
 export default async function handler(req, res) {
+  initializeModules();
+
   if (req.method !== "POST") {
     return res.status(405).json({ error: "Method not allowed" });
   }
