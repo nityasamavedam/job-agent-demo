@@ -11,6 +11,10 @@ export default function Home() {
   const [loading, setLoading] = useState(false);
   const [error, setError]     = useState("");
 
+  const [resumeFile, setResumeFile]   = useState(null);
+  const [resumeName, setResumeName]   = useState("");
+  const [resumeError, setResumeError] = useState("");
+
   const scoreColors = {
     strong_fit: { bg: "#E1F5EE", text: "#08bc38a1", label: "Strong fit" },
     possible:   { bg: "#FAEEDA", text: "#854F0B", label: "Possible fit" },
@@ -20,15 +24,18 @@ export default function Home() {
 
   async function analyse() {
     if (!jd.trim()) { setError("Please paste a job description first."); return; }
+    if (!resumeFile) { setError("Please upload a resume first."); return; }
     setError("");
     setLoading(true);
     setResult(null);
     try {
-      const res  = await fetch("/api/analyse", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ jobDescription: jd, company, role }),
-      });
+      const form = new FormData();
+      form.append("resume", resumeFile);
+      form.append("jobDescription", jd);
+      form.append("company", company);
+      form.append("role", role);
+
+      const res  = await fetch("/api/analyse", { method: "POST", body: form });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Something went wrong");
       setResult(data);
@@ -47,13 +54,31 @@ export default function Home() {
     setError("");
   }
 
+  function handleFileChange(e) {
+    const file = e.target.files[0];
+    if (!file) return;
+    const allowed = [
+      "application/pdf",
+      "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+    ];
+    if (!allowed.includes(file.type)) {
+      setResumeError("Only .pdf or .docx files are supported.");
+      setResumeFile(null);
+      setResumeName("");
+      return;
+    }
+    setResumeError("");
+    setResumeFile(file);
+    setResumeName(file.name);
+  }
+
   const colors = result ? (scoreColors[result.verdict] || scoreColors.possible) : null;
 
   return (
     <>
       <Head>
-        <title>Nitya Samavedam — AI Job Search Agent</title>
-        <meta name="description" content="AI-powered job fit analyser built by Nitya Samavedam" />
+        <title>AI Job Search Agent</title>
+        <meta name="description" content="AI-powered job fit analyser" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
       </Head>
 
@@ -63,7 +88,7 @@ export default function Home() {
         <div style={{ background: "#000", padding: "20px 24px" }}>
           <div style={{ maxWidth: 720, margin: "0 auto", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
             <div>
-              <h1 style={{ color: "#fbfbfc", margin: 0, fontSize: 20, fontWeight: 600, textAlign: "center" }}>Nitya's AI Job Search Agent</h1>
+              <h1 style={{ color: "#fbfbfc", margin: 0, fontSize: 20, fontWeight: 600, textAlign: "center" }}>AI Job Search Agent</h1>
             </div>
             <a href="https://linkedin.com/in/nityasamavedam" target="_blank" rel="noreferrer"
               style={{ color: "#fefefe", fontSize: 13, fontWeight: 200, textDecoration: "none", border: "1px solid #2c22f6", padding: "6px 12px", borderRadius: 6, background: "#072e6d"}}>
@@ -78,7 +103,7 @@ export default function Home() {
           <div style={{ background: "#fff", borderRadius: 12, padding: "20px 24px", marginBottom: 20, border: "0.5px solid #D3D1C7" }}>
             <h2 style={{ margin: "0 0 8px", fontSize: 16, color: "#1A1A1A" }}>How this works:</h2>
             <p style={{ margin: "0 0 12px", fontSize: 14, color: "#5F5E5A", lineHeight: 1.6 }}>
-              This is a live demo of the AI agent I built to automate my job search. Paste any PM job description below. Claude will score it against my profile, identify skill matches and gaps, and generate tailored resume bullets in real time.
+              Upload any resume and paste a job description. Claude will score the fit, identify skill matches and gaps, and generate tailored resume bullets in real time.
             </p>
             <button onClick={loadSample} style={{ background: "#E1F5EE", color: "#0F6E56", border: "none", borderRadius: 6, padding: "7px 14px", fontSize: 12, cursor: "pointer", fontWeight: 500 }}>
               Click here to load sample JD
@@ -98,6 +123,37 @@ export default function Home() {
                 <input value={role} onChange={e => setRole(e.target.value)} placeholder="e.g. AI Product Manager"
                   style={{ width: "100%", padding: "8px 10px", borderRadius: 6, border: "0.5px solid #B4B2A9", fontSize: 13, boxSizing: "border-box" }} />
               </div>
+            </div>
+
+            {/* Resume upload */}
+            <div style={{ marginBottom: 14 }}>
+              <label style={{ fontSize: 12, fontWeight: 500, color: "#5F5E5A", display: "block", marginBottom: 4 }}>
+                Resume* (.pdf or .docx)
+              </label>
+              <label style={{
+                display: "inline-block", cursor: "pointer",
+                background: "#F1EFE8", border: "0.5px solid #B4B2A9",
+                borderRadius: 6, padding: "7px 14px",
+                fontSize: 12, color: "#1A1A1A", fontWeight: 500
+              }}>
+                Choose file
+                <input
+                  type="file"
+                  accept=".pdf,.docx,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+                  onChange={handleFileChange}
+                  style={{ display: "none" }}
+                />
+              </label>
+              {resumeName && (
+                <span style={{ marginLeft: 10, fontSize: 12, color: "#0F6E56", fontWeight: 500 }}>
+                  {resumeName}
+                </span>
+              )}
+              {resumeError && (
+                <p style={{ color: "#A32D2D", fontSize: 13, margin: "6px 0 0" }}>
+                  {resumeError}
+                </p>
+              )}
             </div>
 
             <label style={{ fontSize: 12, fontWeight: 500, color: "#5F5E5A", display: "block", marginBottom: 4 }}>Job description*</label>
