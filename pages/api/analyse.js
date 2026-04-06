@@ -1,16 +1,8 @@
 import Anthropic from "@anthropic-ai/sdk";
-
-// Lazy-load server-side packages to avoid Turbopack bundling
-let formidable, pdfParse, mammoth, fs;
-
-function initializeModules() {
-  if (!formidable) {
-    formidable = require("formidable");
-    pdfParse = require("pdf-parse");
-    mammoth = require("mammoth");
-    fs = require("fs");
-  }
-}
+import { formidable } from "formidable";
+import fs from "fs";
+import pdfParse from "pdf-parse";
+import mammoth from "mammoth";
 
 export const config = {
   api: {
@@ -20,20 +12,11 @@ export const config = {
 
 function parseForm(req) {
   return new Promise((resolve, reject) => {
-    try {
-      const form = formidable({ maxFileSize: 5 * 1024 * 1024 }); // 5 MB cap
-      form.parse(req, (err, fields, files) => {
-        if (err) {
-          console.error("Formidable parse error:", err);
-          reject(err);
-        } else {
-          resolve({ fields, files });
-        }
-      });
-    } catch (e) {
-      console.error("Formidable instantiation error:", e);
-      reject(e);
-    }
+    const form = formidable({ maxFileSize: 5 * 1024 * 1024 }); // 5 MB cap
+    form.parse(req, (err, fields, files) => {
+      if (err) reject(err);
+      else resolve({ fields, files });
+    });
   });
 }
 
@@ -55,8 +38,6 @@ async function extractText(file) {
 }
 
 export default async function handler(req, res) {
-  initializeModules();
-
   if (req.method !== "POST") {
     return res.status(405).json({ error: "Method not allowed" });
   }
@@ -65,7 +46,7 @@ export default async function handler(req, res) {
   try {
     ({ fields, files } = await parseForm(req));
   } catch (err) {
-    console.error("Form parsing error:", err);
+    console.error("Form parse error:", err);
     return res.status(400).json({ error: "Could not parse form data." });
   }
 
