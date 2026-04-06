@@ -114,12 +114,14 @@ export default function Home() {
           <div style={{ background: "#fff", borderRadius: 12, padding: "20px 24px", marginBottom: 16, border: "0.5px solid #D3D1C7" }}>
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, marginBottom: 14 }}>
               <div>
-                <label style={{ fontSize: 12, fontWeight: 500, color: "#5F5E5A", display: "block", marginBottom: 4 }}>Company (optional)</label>
+                <label style={{ fontSize: 16, fontWeight: 500, color: "#1A1A1A", display: "block", marginBottom: 4 }}>Company (optional)</label>
+                <p style={{ fontSize: 14, color: "#888780", margin: "0 0 8px 0", lineHeight: 1.5 }}>Enter the company's name you are applying for</p>
                 <input value={company} onChange={e => setCompany(e.target.value)} placeholder="e.g. Sarvam AI"
                   style={{ width: "100%", padding: "8px 10px", borderRadius: 6, border: "0.5px solid #B4B2A9", fontSize: 13, boxSizing: "border-box" }} />
               </div>
               <div>
-                <label style={{ fontSize: 12, fontWeight: 500, color: "#5F5E5A", display: "block", marginBottom: 4 }}>Role title (optional)</label>
+                <label style={{ fontSize: 16, fontWeight: 500, color: "#1A1A1A", display: "block", marginBottom: 4 }}>Role title (optional)</label>
+                <p style={{ fontSize: 14, color: "#888780", margin: "0 0 8px 0", lineHeight: 1.5 }}>Enter the job title</p>
                 <input value={role} onChange={e => setRole(e.target.value)} placeholder="e.g. AI Product Manager"
                   style={{ width: "100%", padding: "8px 10px", borderRadius: 6, border: "0.5px solid #B4B2A9", fontSize: 13, boxSizing: "border-box" }} />
               </div>
@@ -127,9 +129,10 @@ export default function Home() {
 
             {/* Resume upload */}
             <div style={{ marginBottom: 14 }}>
-              <label style={{ fontSize: 12, fontWeight: 500, color: "#5F5E5A", display: "block", marginBottom: 4 }}>
-                Resume* (.pdf or .docx)
+              <label style={{ fontSize: 16, fontWeight: 500, color: "#1A1A1A", display: "block", marginBottom: 4 }}>
+                Resume<span style={{ color: "#E63946" }}>*</span> (.pdf or .docx)
               </label>
+              <p style={{ fontSize: 14, color: "#888780", margin: "0 0 8px 0", lineHeight: 1.5 }}>Upload your resume file using .pdf or .docx format</p>
               <label style={{
                 display: "inline-block", cursor: "pointer",
                 background: "#F1EFE8", border: "0.5px solid #B4B2A9",
@@ -156,7 +159,8 @@ export default function Home() {
               )}
             </div>
 
-            <label style={{ fontSize: 12, fontWeight: 500, color: "#5F5E5A", display: "block", marginBottom: 4 }}>Job description*</label>
+            <label style={{ fontSize: 16, fontWeight: 500, color: "#1A1A1A", display: "block", marginBottom: 4 }}>Job description<span style={{ color: "#E63946" }}>*</span></label>
+            <p style={{ fontSize: 14, color: "#888780", margin: "0 0 8px 0", lineHeight: 1.5 }}>Paste the full job posting text below. Including the role overview, key responsibilities, required qualifications, preferred qualifications, and any other relevant details from the job posting is better for generating the strengths and gaps.</p>
             <textarea value={jd} onChange={e => setJd(e.target.value)}
               placeholder="Paste the full job description here..."
               rows={7}
